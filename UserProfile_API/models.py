@@ -54,6 +54,9 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     objects = UserProfileManager()
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['date_of_birth']
+
     def __str__(self) -> str:
         """returns user email and birth date"""
         return f"email: {self.email}, birth date: {self.date_of_birth}"
