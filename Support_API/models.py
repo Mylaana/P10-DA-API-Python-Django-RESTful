@@ -17,6 +17,7 @@ class ContributorProjet(models.Model):
 
 
 class Issue(models.Model):
+    """Database Issue model"""
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     author = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
@@ -44,7 +45,9 @@ class Issue(models.Model):
     )
     progression = models.IntegerField(choices=progression_choices)
 
+
 class Comment(models.Model):
+    """Database Comment model"""
     Issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
     author = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
