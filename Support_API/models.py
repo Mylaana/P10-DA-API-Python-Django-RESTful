@@ -19,21 +19,21 @@ class Issue(models.Model):
         (2, 'MEDIUM'),
         (3, 'HIGH'),
     )
-    priority = models.IntegerField(max_length=1, choices=priority_choices)
+    priority = models.IntegerField(choices=priority_choices)
 
     type_choices = (
         (1, 'BUG'),
         (2, 'FEATURE'),
         (3, 'TASK'),
     )
-    type = models.IntegerField(max_length=1, choices=type_choices)
+    type = models.IntegerField(choices=type_choices)
 
     progression_choices = (
         (1, 'To Do'),
         (2, 'In Progress'),
         (3, 'Finished'),
     )
-    progression = models.IntegerField(max_length=1, choices=progression_choices)
+    progression = models.IntegerField(choices=progression_choices)
 
 class Comment(models.Model):
     Issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
