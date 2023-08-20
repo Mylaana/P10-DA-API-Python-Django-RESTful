@@ -9,7 +9,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = models.Project
         fields = ('id', 'name')
 
-
     def create(self, validated_data):
         """Create and return new user"""
         project = models.Project.objects.create_project(
