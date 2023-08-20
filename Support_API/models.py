@@ -6,18 +6,12 @@ class ProjectManager(models.Manager):
     """Database Project manager model"""
     def create_project(self, name, author):
         """Handles project creation"""
-        contribution = ContributorProjet()
-        project = Project()
 
-        contribution.contributors = author
-        contribution.is_author = True
-        contribution.project = project
+        if not author:
+            raise ValueError("The Project must have an author")
 
-        project.name = name
-        project.contributors = author
-
-        contribution.save()
-        project.save()
+        project = Project.objects.create(author=author, name=name)
+        ContributorProjet.objects.create(project=project, contributors=author)
 
         return project
 

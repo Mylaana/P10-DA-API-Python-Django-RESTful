@@ -6,5 +6,5 @@ from . import serializers
 
 class ProjectViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
-    serializer_class = serializers.SupportSerializer
+    serializer_class = serializers.ProjectSerializer
     queryset = models.Project.objects.all()
