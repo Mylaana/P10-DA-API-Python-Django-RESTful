@@ -14,7 +14,8 @@ class UserProfileManager(BaseUserManager):
         age = relativedelta(today, birth_date)
         return age.years
 
-    def create_user(self, email, date_of_birth, password=None):
+    def create_user(self, email, date_of_birth,
+                    can_be_contacted, can_be_shared, password=None):
         """Create user in database"""
 
         if not email:
@@ -24,20 +25,25 @@ class UserProfileManager(BaseUserManager):
             raise ValueError("User must have a date of birth")
 
         if self._calculate_age(date_of_birth) < MINIMUM_AGE:
-            raise ValueError("User must be 15 years old or above")
+            # user under age of MINIMUM_AGE cant have their data shared
+            can_be_shared = False
 
         email = self.normalize_email(email)
 
-        user = self.model(email=email, date_of_birth=date_of_birth)
+        user = self.model(email=email, date_of_birth=date_of_birth,
+                          can_be_contacted=can_be_contacted, can_be_shared=can_be_shared)
         user.set_password(password)
         user.save(using=self.db)
 
         return user
 
-    def create_superuser(self, email, date_of_birth, password):
+    def create_superuser(self, email, date_of_birth,
+                         can_be_contacted, can_be_shared, password):
         """Create superuser in database"""
 
-        user = self.create_user(email, date_of_birth, password)
+        user = self.create_user(email=email, date_of_birth=date_of_birth,
+                                can_be_contacted=can_be_contacted,
+                                can_be_shared=can_be_shared, password=password)
         user.is_superuser = True
         user.is_admin = True
         user.is_staff = True
@@ -48,18 +54,19 @@ class UserProfileManager(BaseUserManager):
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
     """Database user model"""
-
-    email = models.EmailField(max_length=255, unique=True)
+    username = models.CharField(max_length=50, unique=True)
+    email = models.EmailField(max_length=255)
     date_of_birth = models.DateField()
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    contact_me = models.BooleanField(default=False)
+    can_be_contacted = models.BooleanField(default=False)
+    can_data_be_shared = models.BooleanField(default=False)
 
     objects = UserProfileManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['date_of_birth', 'contact_me']
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['date_of_birth', 'can_be_contacted', 'can_data_be_shared', 'email']
 
     def __str__(self) -> str:
         """returns user email and birth date"""
