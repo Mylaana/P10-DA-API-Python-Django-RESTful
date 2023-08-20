@@ -14,7 +14,7 @@ class UserProfileManager(BaseUserManager):
         age = relativedelta(today, birth_date)
         return age.years
 
-    def create_user(self, email, date_of_birth,
+    def create_user(self, username, email, date_of_birth,
                     can_be_contacted, can_be_shared, password=None):
         """Create user in database"""
 
@@ -30,7 +30,7 @@ class UserProfileManager(BaseUserManager):
 
         email = self.normalize_email(email)
 
-        user = self.model(email=email, date_of_birth=date_of_birth,
+        user = self.model(username=username, email=email, date_of_birth=date_of_birth,
                           can_be_contacted=can_be_contacted, can_be_shared=can_be_shared)
         user.set_password(password)
         user.save(using=self.db)
@@ -57,11 +57,12 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=255)
     date_of_birth = models.DateField()
+    can_be_contacted = models.BooleanField(default=False)
+    can_data_be_shared = models.BooleanField(default=False)
+
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    can_be_contacted = models.BooleanField(default=False)
-    can_data_be_shared = models.BooleanField(default=False)
 
     objects = UserProfileManager()
 
