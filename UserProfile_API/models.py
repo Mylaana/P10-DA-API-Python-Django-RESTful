@@ -57,8 +57,8 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=255)
     date_of_birth = models.DateField()
-    can_be_contacted = models.BooleanField(default=False)
-    can_data_be_shared = models.BooleanField(default=False)
+    can_be_contacted = models.BooleanField(default=True)
+    can_data_be_shared = models.BooleanField(default=True)
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
