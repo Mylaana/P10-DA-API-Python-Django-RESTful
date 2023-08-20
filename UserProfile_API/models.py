@@ -15,7 +15,7 @@ class UserProfileManager(BaseUserManager):
         return age.years
 
     def create_user(self, username, email, date_of_birth,
-                    can_be_contacted, can_be_shared, password=None):
+                    can_be_contacted, can_data_be_shared, password=None):
         """Create user in database"""
 
         if not email:
@@ -26,24 +26,24 @@ class UserProfileManager(BaseUserManager):
 
         if self._calculate_age(date_of_birth) < MINIMUM_AGE:
             # user under age of MINIMUM_AGE cant have their data shared
-            can_be_shared = False
+            can_data_be_shared = False
 
         email = self.normalize_email(email)
 
         user = self.model(username=username, email=email, date_of_birth=date_of_birth,
-                          can_be_contacted=can_be_contacted, can_be_shared=can_be_shared)
+                          can_be_contacted=can_be_contacted, can_data_be_shared=can_data_be_shared)
         user.set_password(password)
         user.save(using=self.db)
 
         return user
 
-    def create_superuser(self, email, date_of_birth,
-                         can_be_contacted, can_be_shared, password):
+    def create_superuser(self, username, email, date_of_birth,
+                         can_be_contacted, can_data_be_shared, password):
         """Create superuser in database"""
 
-        user = self.create_user(email=email, date_of_birth=date_of_birth,
+        user = self.create_user(username=username, email=email, date_of_birth=date_of_birth,
                                 can_be_contacted=can_be_contacted,
-                                can_be_shared=can_be_shared, password=password)
+                                can_data_be_shared=can_data_be_shared, password=password)
         user.is_superuser = True
         user.is_admin = True
         user.is_staff = True
