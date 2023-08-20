@@ -71,3 +71,10 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def __str__(self) -> str:
         """returns user email and birth date"""
         return f"email: {self.email}, birth date: {self.date_of_birth}"
+
+class Contributor(models.Model):
+    user_profile = models.OneToOneField(
+        UserProfile,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
