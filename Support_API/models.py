@@ -2,18 +2,42 @@ from django.db import models
 from UserProfile_API.models import Contributor
 
 
+class ProjectManager(models.Manager):
+    """Database Project manager model"""
+    def create_project(self, name, author):
+        """Handles project creation"""
+        contribution = ContributorProjet()
+        project = Project()
+
+        contribution.contributors = author
+        contribution.is_author = True
+        contribution.project = project
+
+        project.name = name
+        project.contributors = author
+
+        contribution.save()
+        project.save()
+
+        return project
+
+
 class Project(models.Model):
     """Database Project class model"""
     name = models.CharField(max_length=255)
     created_time = models.DateTimeField(auto_now_add=True)
-    contributors = models.ManyToManyField(Contributor, through='ContributorProjet')
+    contributors = models.ManyToManyField(Contributor, through='ContributorProjet',
+                                          related_name='projects_contributed')
+    author = models.ForeignKey(Contributor, on_delete=models.SET_NULL, null=True,
+                               related_name='projects_authored')
+
+    objects = ProjectManager()
 
 
 class ContributorProjet(models.Model):
     """Database ptoject-contributors in between table"""
     contributors = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    is_author = models.BooleanField(default=False)
 
 
 class Issue(models.Model):
