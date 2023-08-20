@@ -1,7 +1,8 @@
+from datetime import date
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from dateutil.relativedelta import relativedelta
-from datetime import date
+
 
 MINIMUM_AGE = 15
 
@@ -53,11 +54,12 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    contact_me = models.BooleanField(default=False)
 
     objects = UserProfileManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['date_of_birth']
+    REQUIRED_FIELDS = ['date_of_birth', 'contact_me']
 
     def __str__(self) -> str:
         """returns user email and birth date"""
