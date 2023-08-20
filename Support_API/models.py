@@ -1,9 +1,19 @@
 from django.db import models
 from UserProfile_API.models import Contributor
 
+
 class Project(models.Model):
     """Database Project class model"""
+    name = models.CharField(max_length=255)
     created_time = models.DateTimeField(auto_now_add=True)
+    contributors = models.ManyToManyField(Contributor, through='ContributorProjet')
+
+
+class ContributorProjet(models.Model):
+    """Database ptoject-contributors in between table"""
+    contributors = models.ForeignKey(Contributor, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    is_author = models.BooleanField(default=False)
 
 
 class Issue(models.Model):
@@ -12,7 +22,6 @@ class Issue(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=2048)
-    contributors = []
 
     priority_choices = (
         (1, 'LOW'),
