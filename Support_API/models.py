@@ -15,6 +15,31 @@ class ProjectManager(models.Manager):
 
         return project
 
+class IssueManager(models.Manager):
+    """Database Issue manager model"""
+    def create_issue(self, name, author, project, description, priority, issue_type, progression):
+        """Handles Issue creation"""
+
+        issue = Issue.objects.create(
+            name=name, author=author, project=project, description=description,
+            priority=priority, issue_type=issue_type, progression=progression)
+
+        return issue
+
+
+class CommentManager(models.Manager):
+    """Database Project manager model"""
+    def create_project(self, name, author):
+        """Handles project creation"""
+
+        if not author:
+            raise ValueError("The Project must have an author")
+
+        project = Project.objects.create(author=author, name=name)
+        ContributorProjet.objects.create(project=project, contributors=author)
+
+        return project
+
 
 class Project(models.Model):
     """Database Project class model"""
@@ -54,7 +79,7 @@ class Issue(models.Model):
         (2, 'FEATURE'),
         (3, 'TASK'),
     )
-    type = models.IntegerField(choices=type_choices)
+    issue_type = models.IntegerField(choices=type_choices)
 
     progression_choices = (
         (1, 'To Do'),
@@ -63,6 +88,7 @@ class Issue(models.Model):
     )
     progression = models.IntegerField(choices=progression_choices)
 
+    objects = IssueManager()
 
 class Comment(models.Model):
     """Database Comment model"""
@@ -70,3 +96,5 @@ class Comment(models.Model):
     author = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
     description = models.TextField(max_length=2048)
+
+    objects = CommentManager()

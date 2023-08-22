@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'UserProfile_API',
     'Support_API',
     'rest_framework',
-    'rest_framework.authentication'
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
