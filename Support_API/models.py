@@ -53,15 +53,9 @@ class Project(models.Model):
     objects = ProjectManager()
 
 
-class ContributorProjet(models.Model):
-    """Database ptoject-contributors in between table"""
-    contributors = models.ForeignKey(Contributor, on_delete=models.CASCADE)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-
-
 class Issue(models.Model):
     """Database Issue model"""
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='issues')
     author = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=255)
@@ -98,3 +92,8 @@ class Comment(models.Model):
     description = models.TextField(max_length=2048)
 
     objects = CommentManager()
+
+class ContributorProjet(models.Model):
+    """Database ptoject-contributors in between table"""
+    contributors = models.ForeignKey(Contributor, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)

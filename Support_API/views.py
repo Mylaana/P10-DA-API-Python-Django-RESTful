@@ -14,7 +14,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 class IssueViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
-    serializer_class = serializers.IssuSerializer
+    serializer_class = serializers.IssueSerializer
     queryset = models.Issue.objects.all()
     authentication_classes = (TokenAuthentication,)
 
