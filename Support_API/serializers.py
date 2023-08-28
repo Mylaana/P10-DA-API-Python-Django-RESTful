@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.fields import empty
 from Support_API import models
 from UserProfile_API.models import Contributor
 
@@ -19,60 +20,64 @@ def get_contributor(user):
 
 class BaseSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
-    project_id = ""
+    serializer_url = ''
+    excluded_fields = []
+    url_name_project = 'project'
+    url_name_issue = 'issue'
+    url_name_comment = 'comment'
+
+    def get_parent_url(self, obj):
+        return ""
 
     def get_url(self, obj):
         request = self.context.get('request', None)
-        if request:
-            request_url = request.build_absolute_uri()
+        if not request:
+            return
+        self.parent_url = self.get_parent_url(obj)
 
-            if str(request_url.split("/")[-2]) == str(obj.id) :
-                return request_url
-            else:
-                return request_url + self.project_id + str(obj.id) + "/"
+        request_url = request.build_absolute_uri("/")
+        return request_url + self.parent_url + self.serializer_url + str(obj.id)
 
-class CommentSerializer(serializers.ModelSerializer):
-    """Serializes Project model"""
+class CommentSerializer(BaseSerializer):
+    """Serializes Comment model"""
+    url = serializers.SerializerMethodField()
+    serializer_url = 'comment/'
 
     class Meta:
-        model = models.Issue
-        fields = ('id', 'description')
+        model = models.Comment
+        fields = '__all__'
 
     def create(self, validated_data):
-        """Create and return new user"""
-        project = models.Project.objects.create_project(
-            name=validated_data['description'],
-            author=self.get_contributor(self.context['request'].user),
-            issue=self.contex['request'].issue
+        """Create and return new comment"""
+        comment = models.Comment.objects.create_comment(
+            description=validated_data['description'],
+            author=get_contributor(self.context['request'].user),
+            issue=validated_data['issue']
         )
 
-        return project
+        return comment
 
-    def get_contributor(self, user):
-        """
-        check if user is already a contributor on any project,
-        adds them in contributor list if not
+    def get_project_id(self, obj):
+        return obj.issue.project.id
 
-        returns a contributor id
-        """
-
-        contributor = Contributor.objects.filter(user_profile=user).first()
-        if contributor is None:
-            contributor = Contributor.objects.create(user_profile=user)
-
-        return contributor
+    def get_parent_url(self, obj):
+        project_url = str(self.url_name_project) + "/"  + str(obj.issue.project.id) + "/" + str(self.url_name_issue) + "/"  + str(obj.issue.id) + "/"
+        return str(project_url)
 
 class IssueSerializer(BaseSerializer):
-    """Serializes Project model"""
-    url = serializers.SerializerMethodField()
-
+    """Serializes Issue model"""
     class Meta:
         model = models.Issue
         fields = '__all__'
-    
+    comments = CommentSerializer(many=True, read_only=True)
+    url = serializers.SerializerMethodField()
+    project_id = serializers.SerializerMethodField()
+    serializer_url = 'issue/'
+
+
 
     def create(self, validated_data):
-        """Create and return new user"""
+        """Create and return new Issue"""
         issue = models.Issue.objects.create_issue(
             name=validated_data['name'],
             author=get_contributor(self.context['request'].user),
@@ -85,17 +90,26 @@ class IssueSerializer(BaseSerializer):
 
         return issue
 
+    def get_project_id(self, obj):
+        return obj.project.id
+
+    def get_parent_url(self, obj):
+        project_url = str(self.url_name_project) + "/"  + str(obj.project.id) + "/"
+        return str(project_url)
+
 class ProjectSerializer(BaseSerializer):
     """Serializes Project model"""
     issues = IssueSerializer(many=True, read_only=True)
     url = serializers.SerializerMethodField()
+    parent_url = ''
+    serializer_url = 'project/'
 
     class Meta:
         model = models.Project
-        fields = ['id', 'url', 'name', 'issues']
+        fields = '__all__'
 
     def create(self, validated_data):
-        """Create and return new user"""
+        """Create and return new Project"""
         project = models.Project.objects.create_project(
             name=validated_data['name'],
             author=get_contributor(self.context['request'].user),

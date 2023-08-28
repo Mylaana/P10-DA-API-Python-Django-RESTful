@@ -29,16 +29,12 @@ class IssueManager(models.Manager):
 
 class CommentManager(models.Manager):
     """Database Project manager model"""
-    def create_project(self, name, author):
-        """Handles project creation"""
+    def create_comment(self, issue, author, description):
+        """Handles comment creation"""
 
-        if not author:
-            raise ValueError("The Project must have an author")
+        comment = Comment.objects.create(issue=issue, author=author, description=description)
 
-        project = Project.objects.create(author=author, name=name)
-        ContributorProjet.objects.create(project=project, contributors=author)
-
-        return project
+        return comment
 
 
 class Project(models.Model):
@@ -86,7 +82,7 @@ class Issue(models.Model):
 
 class Comment(models.Model):
     """Database Comment model"""
-    Issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
     description = models.TextField(max_length=2048)
