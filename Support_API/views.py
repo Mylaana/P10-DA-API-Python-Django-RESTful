@@ -18,9 +18,18 @@ class IssueViewSet(viewsets.ModelViewSet):
     queryset = models.Issue.objects.all()
     authentication_classes = (TokenAuthentication,)
 
+    def get_queryset(self):
+        project_id=self.kwargs['project_id']
+        return self.queryset.filter(project_id=project_id)
+
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
     serializer_class = serializers.CommentSerializer
     queryset = models.Comment.objects.all()
     authentication_classes = (TokenAuthentication,)
+
+    def get_queryset(self):
+        issue_id=self.kwargs['issue_id']
+        return self.queryset.filter(issue_id=issue_id)
