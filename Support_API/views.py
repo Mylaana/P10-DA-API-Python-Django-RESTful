@@ -23,7 +23,6 @@ class IssueViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(project_id=project_id)
 
 
-
 class CommentViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
     serializer_class = serializers.CommentSerializer
