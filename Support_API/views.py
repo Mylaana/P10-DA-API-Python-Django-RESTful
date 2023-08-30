@@ -32,3 +32,13 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         issue_id=self.kwargs['issue_id']
         return self.queryset.filter(issue_id=issue_id)
+
+class ContributionViewSet(viewsets.ModelViewSet):
+    """Handles user contribution to projects"""
+    serializer_class = serializers.ContributionSerializer
+    queryset = models.ContributorProjet.objects.all()
+    authentication_classes = (TokenAuthentication,)
+
+    def get_queryset(self):
+        contributors=3
+        return self.queryset.filter(contributors=contributors)

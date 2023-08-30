@@ -167,3 +167,34 @@ class ProjectSerializer(BaseSerializer):
 
     def get_contributors_name(self, obj):
         return get_contributors_name_list(obj.contributors.all())
+
+
+class ContributionSerializer(serializers.ModelSerializer):
+    """Serializes UserProfile model"""
+
+    class Meta:
+        model = models.ContributorProjet
+        if SERIALIZER_DEBUG:
+            fields = '__all__'
+        else:
+            fields = ['url', 'project']
+
+
+    def create(self, validated_data):
+        """Create and return new user"""
+        user = models.ContributorProjet.objects.create(
+            project=validated_data['project'],
+            contributors=get_contributor(self.context['request'].user),
+        )
+
+        return user
+
+    def update(self, instance, validated_data):
+        """Handle updating user account"""
+        """
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+            instance.set_password(password)
+
+        return super().update(instance, validated_data)
+        """
