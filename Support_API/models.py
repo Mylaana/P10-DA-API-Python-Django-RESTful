@@ -96,7 +96,7 @@ class Comment(models.Model):
     author = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
     description = models.TextField(max_length=2048)
-    comment_uuid = models.UUIDField(
+    id = models.UUIDField(
         primary_key = True,
         default = uuid.uuid4,
         editable = False,
