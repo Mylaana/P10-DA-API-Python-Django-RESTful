@@ -24,5 +24,4 @@ utilisateurs ne peuvent que lire la ressource.
 
 
 questions mentorat : 
-qu'entends-t-on par uuid autogénéré ? l'id des models ?
 comment capter l'id contributor dans la permission
