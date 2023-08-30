@@ -1,22 +1,22 @@
-from django.shortcuts import render
 from rest_framework import viewsets
 from Support_API import models
 from . import serializers
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from Support_API import permissions
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
     serializer_class = serializers.ProjectSerializer
     queryset = models.Project.objects.all()
-    authentication_classes = (TokenAuthentication,)
+    permission_classes = [IsAuthenticated, permissions.UpdateContributions]
 
 
 class IssueViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
     serializer_class = serializers.IssueSerializer
     queryset = models.Issue.objects.all()
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = [IsAuthenticated, permissions.UpdateContributions]
 
     def get_queryset(self):
         project_id=self.kwargs['project_id']
@@ -27,7 +27,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
     serializer_class = serializers.CommentSerializer
     queryset = models.Comment.objects.all()
-    authentication_classes = (TokenAuthentication,)
+    permission_classes = [IsAuthenticated, permissions.UpdateContributions]
 
     def get_queryset(self):
         issue_id=self.kwargs['issue_id']
@@ -37,7 +37,7 @@ class ContributionViewSet(viewsets.ModelViewSet):
     """Handles user contribution to projects"""
     serializer_class = serializers.ContributionSerializer
     queryset = models.ContributorProjet.objects.all()
-    authentication_classes = (TokenAuthentication,)
+    permission_classes = [IsAuthenticated, permissions.UpdateContributions]
 
     def get_queryset(self):
         contributors=3
