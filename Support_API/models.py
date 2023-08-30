@@ -45,6 +45,15 @@ class Project(models.Model):
                                           related_name='projects_contributed')
     author = models.ForeignKey(Contributor, on_delete=models.SET_NULL, null=True,
                                related_name='projects_authored')
+    
+    description = models.TextField(max_length=2048)
+    type_choices = (
+        (1, 'back-end'),
+        (2, 'front-end'),
+        (3, 'iOS'),
+        (4, 'Android'),
+    )
+    project_type = models.IntegerField(choices=type_choices)
 
     objects = ProjectManager()
 
