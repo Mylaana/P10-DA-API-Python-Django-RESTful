@@ -3,7 +3,7 @@ from rest_framework.fields import empty
 from Support_API import models
 from UserProfile_API.models import Contributor
 
-SERIALIZER_DEBUG = False
+SERIALIZER_DEBUG = True
 
 def get_contributor(user_id):
     """
