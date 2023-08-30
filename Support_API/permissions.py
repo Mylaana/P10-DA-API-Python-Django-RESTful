@@ -8,10 +8,10 @@ class UpdateContributions(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        if request.method == 'DELETE':
-            return False
-
-        if request.user.is_admin:
+        if request.user.is_admin or request.user.is_superuser:
             return True
 
-        return False
+        if request.method == 'DELETE' :
+            return False
+
+        return True

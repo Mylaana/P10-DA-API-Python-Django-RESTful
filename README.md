@@ -4,5 +4,3 @@ Création d'une API sécurisée RESTful avec Django REST framework
 
 ajouter :
 impossibilité de doublon contributor-project
-permissions
-authentication

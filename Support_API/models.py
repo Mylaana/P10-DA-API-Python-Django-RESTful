@@ -93,3 +93,6 @@ class ContributorProjet(models.Model):
     """Database ptoject-contributors in between table"""
     contributors = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('contributors', 'project')
