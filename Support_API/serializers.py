@@ -72,6 +72,8 @@ class BaseSerializer(serializers.ModelSerializer):
         request_url = request.build_absolute_uri("/")
         return request_url + self.parent_url + self.serializer_url 
 
+    def get_parent_id_from_url(self, request):
+        return request.build_absolute_uri().split("/")[-3]
 
 class CommentSerializer(BaseSerializer):
     """Serializes Comment model"""
@@ -91,13 +93,9 @@ class CommentSerializer(BaseSerializer):
         comment = models.Comment.objects.create_comment(
             description=validated_data['description'],
             author=get_contributor(self.context['request'].user),
-            issue=self.get_issue_id_from_url(self.context['request'])
+            issue=models.Issue.objects.get(id=self.get_parent_id_from_url(self.context['request']))
         )
         return comment
-
-    def get_issue_id_from_url(self, request):
-        project_id = request.build_absolute_uri().split("/")[-3]
-        return models.Issue.objects.get(id=project_id)
 
     def get_project_id(self, obj):
         return obj.issue.project.id
@@ -115,13 +113,12 @@ class IssueSerializer(BaseSerializer):
         else:
             fields = ['url', 'url_new_item', 'created_time', 'name', 'author_name','priority',
                       'priority_description', 'issue_type', 'issue_type_description', 'progression', 
-                      'progression_description', 'comments', 'description']
+                      'progression_description', 'description', 'comments']
 
         extra_kwargs = {
             'progression': {'write_only': True},
             'issue_type': {'write_only': True},
             'priority': {'write_only': True},
-            'description': {'write_only': True},
         }
 
 
@@ -132,25 +129,19 @@ class IssueSerializer(BaseSerializer):
     priority_description = serializers.CharField(source='get_priority_display', read_only=True)
     issue_type_description = serializers.CharField(source='get_issue_type_display', read_only=True)
     progression_description = serializers.CharField(source='get_progression_display', read_only=True)
-    # project_id_from_url = serializers.SerializerMethodField()
-
 
     def create(self, validated_data):
         """Create and return new Issue"""
         issue = models.Issue.objects.create_issue(
             name=validated_data['name'],
             author=get_contributor(self.context['request'].user),
-            project=self.get_project_id_from_url(self.context['request']),
+            project=models.Project.objects.get(id=self.get_parent_id_from_url(self.context['request'])),
             description=validated_data['description'],
             priority=validated_data['priority'],
             issue_type=validated_data['issue_type'],
             progression=validated_data['progression']
         )
         return issue
-
-    def get_project_id_from_url(self, request):
-        project_id = request.build_absolute_uri().split("/")[-3]
-        return models.Project.objects.get(id=project_id)
 
     def get_project_id(self, obj):
         return obj.project.id
@@ -176,7 +167,8 @@ class ProjectSerializer(BaseSerializer):
             fields = '__all__'
         else:
             fields = ['url','url_new_item', 'created_time', 'name',
-                      'author_name', 'project_type', 'project_type_description', 'contributors_name', 'description', 'issues']
+                      'author_name', 'project_type', 'project_type_description',
+                      'contributors_name', 'description', 'issues']
 
         extra_kwargs = {
             'project_type': {'write_only': True},
