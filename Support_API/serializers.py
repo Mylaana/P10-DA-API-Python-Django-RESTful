@@ -3,7 +3,7 @@ from rest_framework.fields import empty
 from Support_API import models
 from UserProfile_API.models import Contributor
 
-SERIALIZER_DEBUG = True
+SERIALIZER_DEBUG = False
 
 def get_contributor(user_id):
     """
@@ -91,9 +91,13 @@ class CommentSerializer(BaseSerializer):
         comment = models.Comment.objects.create_comment(
             description=validated_data['description'],
             author=get_contributor(self.context['request'].user),
-            issue=validated_data['issue']
+            issue=self.get_issue_id_from_url(self.context['request'])
         )
         return comment
+
+    def get_issue_id_from_url(self, request):
+        project_id = request.build_absolute_uri().split("/")[-3]
+        return models.Issue.objects.get(id=project_id)
 
     def get_project_id(self, obj):
         return obj.issue.project.id
@@ -109,15 +113,26 @@ class IssueSerializer(BaseSerializer):
         if SERIALIZER_DEBUG:
             fields = '__all__'
         else:
-            fields = ['url', 'url_new_item', 'created_time', 'name', 'author_name','priority', 'issue_type', 'progression', 'comments']
+            fields = ['url', 'url_new_item', 'created_time', 'name', 'author_name','priority',
+                      'priority_description', 'issue_type', 'issue_type_description', 'progression', 
+                      'progression_description', 'comments', 'description']
+
+        extra_kwargs = {
+            'progression': {'write_only': True},
+            'issue_type': {'write_only': True},
+            'priority': {'write_only': True},
+            'description': {'write_only': True},
+        }
+
 
     comments = CommentSerializer(many=True, read_only=True)
     url = serializers.SerializerMethodField()
     serializer_url = 'issue/'
 
-    priority = serializers.CharField(source='get_priority_display', read_only=True)
-    issue_type = serializers.CharField(source='get_issue_type_display', read_only=True)
-    progression = serializers.CharField(source='get_progression_display', read_only=True)
+    priority_description = serializers.CharField(source='get_priority_display', read_only=True)
+    issue_type_description = serializers.CharField(source='get_issue_type_display', read_only=True)
+    progression_description = serializers.CharField(source='get_progression_display', read_only=True)
+    # project_id_from_url = serializers.SerializerMethodField()
 
 
     def create(self, validated_data):
@@ -125,14 +140,17 @@ class IssueSerializer(BaseSerializer):
         issue = models.Issue.objects.create_issue(
             name=validated_data['name'],
             author=get_contributor(self.context['request'].user),
-            project=validated_data['project'],
+            project=self.get_project_id_from_url(self.context['request']),
             description=validated_data['description'],
             priority=validated_data['priority'],
             issue_type=validated_data['issue_type'],
             progression=validated_data['progression']
         )
-
         return issue
+
+    def get_project_id_from_url(self, request):
+        project_id = request.build_absolute_uri().split("/")[-3]
+        return models.Project.objects.get(id=project_id)
 
     def get_project_id(self, obj):
         return obj.project.id
@@ -148,20 +166,29 @@ class ProjectSerializer(BaseSerializer):
     url = serializers.SerializerMethodField()
     parent_url = ''
     serializer_url = 'project/'
+    project_type_description = serializers.CharField(source='get_project_type_display', read_only=True)
+
 
     class Meta:
         model = models.Project
+
         if SERIALIZER_DEBUG:
             fields = '__all__'
         else:
-            fields = ['url','url_new_item', 'created_time', 'name', 'author_name', 'contributors_name', 'issues']
+            fields = ['url','url_new_item', 'created_time', 'name',
+                      'author_name', 'project_type', 'project_type_description', 'contributors_name', 'description', 'issues']
 
+        extra_kwargs = {
+            'project_type': {'write_only': True},
+        }
 
     def create(self, validated_data):
         """Create and return new Project"""
         project = models.Project.objects.create_project(
             name=validated_data['name'],
             author=get_contributor(self.context['request'].user),
+            description=validated_data['description'],
+            project_type=validated_data['project_type'],
         )
         return project
 

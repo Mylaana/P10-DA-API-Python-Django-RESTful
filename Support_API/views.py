@@ -16,7 +16,7 @@ class IssueViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
     serializer_class = serializers.IssueSerializer
     queryset = models.Issue.objects.all()
-    authentication_classes = [IsAuthenticated, permissions.UpdateRessource]
+    permission_classes = [IsAuthenticated, permissions.UpdateRessource]
 
     def get_queryset(self):
         project_id=self.kwargs['project_id']

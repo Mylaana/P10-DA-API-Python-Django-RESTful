@@ -13,15 +13,8 @@ le souhaite. Attention, seuls les contributeurs du projet correspondant à l’i
 sont sélectionnables.
 
 
-- Enfin, un identifiant unique de type uuid est automatiquement généré. Ce
-dernier permet de mieux référencer le comment.
-
-
 -L’auteur d’une ressource peut modifier ou supprimer cette ressource. Les autres
 utilisateurs ne peuvent que lire la ressource.
 
 - Un système de pagination est implémenté pour le listage des ressources.
 
-
-questions mentorat : 
-comment capter l'id contributor dans la permission

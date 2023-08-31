@@ -5,13 +5,13 @@ from UserProfile_API.models import Contributor
 
 class ProjectManager(models.Manager):
     """Database Project manager model"""
-    def create_project(self, name, author):
+    def create_project(self, name, author, description, project_type):
         """Handles project creation"""
 
         if not author:
             raise ValueError("The Project must have an author")
 
-        project = Project.objects.create(author=author, name=name)
+        project = Project.objects.create(author=author, name=name, description=description, project_type=project_type)
         ContributorProjet.objects.create(project=project, contributors=author)
 
         return project
@@ -46,7 +46,7 @@ class Project(models.Model):
                                           related_name='projects_contributed')
     author = models.ForeignKey(Contributor, on_delete=models.SET_NULL, null=True,
                                related_name='projects_authored')
-    
+
     description = models.TextField(max_length=2048)
     type_choices = (
         (1, 'back-end'),
