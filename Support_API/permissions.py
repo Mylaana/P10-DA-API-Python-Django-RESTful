@@ -12,7 +12,7 @@ class UpdateRessource(permissions.BasePermission):
         if not self.is_project_contributor(request, obj):
             return False
 
-        if request.method in permissions.SAFE_METHODS and self.is_project_contributor(request, obj):
+        if request.method in permissions.SAFE_METHODS:
             return True
 
         if request.method == 'DELETE' and self.is_project_author(request, obj):
@@ -46,3 +46,17 @@ class UpdateRessource(permissions.BasePermission):
         returning True if request.user is project's author
         """
         return obj.author.user_profile == request.user
+
+
+class UpdateContribution(permissions.BasePermission):
+    """Allow user to edit a ressource"""
+
+    def has_object_permission(self, request, view, obj):
+        """Check user is trying to update their own profile"""
+        if request.user.is_admin or request.user.is_superuser:
+            return True
+
+        if request.method in permissions.SAFE_METHODS or request.method == 'POST':
+            return True
+
+        return False

@@ -64,7 +64,7 @@ class Issue(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='issues')
     author = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     description = models.TextField(max_length=2048)
 
     priority_choices = (
@@ -112,3 +112,6 @@ class ContributorProjet(models.Model):
 
     class Meta:
         unique_together = ('contributors', 'project')
+
+    def __str__(self):
+        return f"Contribution id: {self.id}, Username: {self.contributors.user_profile.username}, project id: {self.project.id}"

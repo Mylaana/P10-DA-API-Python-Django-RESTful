@@ -37,7 +37,7 @@ class ContributionViewSet(viewsets.ModelViewSet):
     """Handles user contribution to projects"""
     serializer_class = serializers.ContributionSerializer
     queryset = models.ContributorProjet.objects.all()
-    permission_classes = [IsAuthenticated, permissions.UpdateRessource]
+    permission_classes = [IsAuthenticated, permissions.UpdateContribution]
 
     def get_queryset(self):
         contributors=3
