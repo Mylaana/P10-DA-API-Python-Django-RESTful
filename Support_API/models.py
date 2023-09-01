@@ -29,7 +29,7 @@ class IssueManager(models.Manager):
 
 
 class CommentManager(models.Manager):
-    """Database Project manager model"""
+    """Database Comment manager model"""
     def create_comment(self, issue, author, description):
         """Handles comment creation"""
 
@@ -40,7 +40,7 @@ class CommentManager(models.Manager):
 
 class Project(models.Model):
     """Database Project class model"""
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     created_time = models.DateTimeField(auto_now_add=True)
     contributors = models.ManyToManyField(Contributor, through='ContributorProjet',
                                           related_name='projects_contributed')
@@ -106,7 +106,7 @@ class Comment(models.Model):
 
 
 class ContributorProjet(models.Model):
-    """Database ptoject-contributors in between table"""
+    """Database project-contributors many-to-many in between table"""
     contributors = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 

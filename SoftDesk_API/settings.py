@@ -137,5 +137,5 @@ AUTH_USER_MODEL = 'UserProfile_API.UserProfile'
 
 # redefining token lifetime for testing purposes
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=600),
 }
