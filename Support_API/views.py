@@ -17,7 +17,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
     serializer_class = serializers.ProjectSerializer
     permission_classes = [IsAuthenticated, permissions.UpdateRessource]
-    queryset = models.Comment.objects.all()
+    queryset = models.Project.objects.all()
 
     def get_queryset(self):
         """customizing queryset according to user rights"""
