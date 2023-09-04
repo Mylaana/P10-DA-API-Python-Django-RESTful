@@ -15,24 +15,21 @@ class UpdateRessource(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        if request.method == 'DELETE' and self.is_project_author(request, obj):
-            return False
-
         if self.is_project_author(request, obj):
             return True
 
-        return True
+        return False
 
     def is_project_contributor(self, request, obj):
         """
         returning True if request.user is amongst contributors
         """
         contributors = None
-        if type(obj) == models.Project:
+        if isinstance(obj, models.Project):
             contributors = obj.contributors.all()
-        elif type(obj) == models.Issue:
+        elif isinstance(obj, models.Issue):
             contributors = obj.project.contributors.all()
-        elif type(obj) == models.Comment:
+        elif isinstance(obj, models.Comment):
             contributors = obj.issue.project.contributors.all()
 
         for contributor in contributors:

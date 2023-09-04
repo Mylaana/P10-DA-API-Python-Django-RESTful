@@ -187,17 +187,36 @@ class ProjectSerializer(BaseSerializer):
     def get_contributors_name(self, obj):
         return get_contributors_name_list(obj.contributors.all())
 
+class ChoicesField(serializers.Field):
+    def __init__(self, choices, **kwargs):
+        self._choices = choices
+        super(ChoicesField, self).__init__(**kwargs)
+
+    def to_representation(self, obj):
+        return self._choices[obj]
+
+    def to_internal_value(self, data):
+        return getattr(self._choices, data)
 
 class ContributionSerializer(serializers.ModelSerializer):
     """Serializes UserProfile model"""
+    # project_name = serializers.SerializerMethodField()
+    project_name = serializers.CharField(default='')
+    project_name_list =  serializers.SerializerMethodField()
+    selected_project = serializers.ChoiceField(choices=[("option1", "Option 1"), ("option2", "Option 2")], required=False)
+    # selected_project = ChoicesField(choices=["a","b"])
+
 
     class Meta:
         model = models.ContributorProjet
         if SERIALIZER_DEBUG:
             fields = '__all__'
         else:
-            fields = ['url', 'project']
+            fields = ['url', 'project', 'project_name', 'project_name_list', 'selected_project']
 
+        extra_kwargs = {
+            'project': {'read_only': False},
+        }
 
     def create(self, validated_data):
         """Create and return new user"""
@@ -207,3 +226,11 @@ class ContributionSerializer(serializers.ModelSerializer):
         )
 
         return user
+    """
+    def get_selected_project(self, obj):
+        # Si 'selected_project' n'est pas défini dans l'objet, renvoie une valeur par défaut
+        return getattr(obj, 'selected_project', "option1")
+    """
+    def get_project_name_list(self, obj):
+        return ["pouet","pouet pouet"]
+        return get_contributors_name_list(obj.contributors.all())
