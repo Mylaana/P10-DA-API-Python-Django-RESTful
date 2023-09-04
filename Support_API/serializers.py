@@ -63,14 +63,18 @@ class BaseSerializer(serializers.ModelSerializer):
         request_url = request.build_absolute_uri("/")
         return request_url + self.parent_url + self.serializer_url + str(obj.id)
 
-    def get_url_new_item(self, obj):
+    def get_url_new_child(self, obj):
         request = self.context.get('request', None)
         if not request:
             return
         self.parent_url = self.get_parent_url(obj)
 
         request_url = request.build_absolute_uri("/")
-        return request_url + self.parent_url + self.serializer_url 
+        if isinstance(obj, models.Project):
+            child_url = "/issue"
+        elif isinstance(obj, models.Issue):
+            child_url = "/comment"
+        return request_url + self.parent_url + self.serializer_url + str(obj.id) + child_url
 
     def get_parent_id_from_url(self, request):
         return request.build_absolute_uri().split("/")[-3]
@@ -111,7 +115,7 @@ class IssueSerializer(BaseSerializer):
         if SERIALIZER_DEBUG:
             fields = '__all__'
         else:
-            fields = ['url', 'url_new_item', 'created_time', 'name', 'author_name','priority',
+            fields = ['url', 'add_new_comment', 'created_time', 'name', 'author_name','priority',
                       'priority_description', 'issue_type', 'issue_type_description', 'progression', 
                       'progression_description', 'description', 'comments']
 
@@ -125,6 +129,7 @@ class IssueSerializer(BaseSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     url = serializers.SerializerMethodField()
     serializer_url = 'issue/'
+    add_new_comment = serializers.SerializerMethodField()
 
     priority_description = serializers.CharField(source='get_priority_display', read_only=True)
     issue_type_description = serializers.CharField(source='get_issue_type_display', read_only=True)
@@ -143,6 +148,9 @@ class IssueSerializer(BaseSerializer):
         )
         return issue
 
+    def get_add_new_comment(self, obj):
+        return self.get_url_new_child(obj)
+
     def get_project_id(self, obj):
         return obj.project.id
 
@@ -155,6 +163,7 @@ class ProjectSerializer(BaseSerializer):
     issues = IssueSerializer(many=True, read_only=True)
     contributors_name = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
+    add_new_issue = serializers.SerializerMethodField()
     parent_url = ''
     serializer_url = 'project/'
     project_type_description = serializers.CharField(source='get_project_type_display', read_only=True)
@@ -166,7 +175,7 @@ class ProjectSerializer(BaseSerializer):
         if SERIALIZER_DEBUG:
             fields = '__all__'
         else:
-            fields = ['url','url_new_item', 'created_time', 'name',
+            fields = ['url','add_new_issue', 'created_time', 'name',
                       'author_name', 'project_type', 'project_type_description',
                       'contributors_name', 'description', 'issues']
 
@@ -187,23 +196,11 @@ class ProjectSerializer(BaseSerializer):
     def get_contributors_name(self, obj):
         return get_contributors_name_list(obj.contributors.all())
 
-class ChoicesField(serializers.Field):
-    def __init__(self, choices, **kwargs):
-        self._choices = choices
-        super(ChoicesField, self).__init__(**kwargs)
-
-    def to_representation(self, obj):
-        return self._choices[obj]
-
-    def to_internal_value(self, data):
-        return getattr(self._choices, data)
+    def get_add_new_issue(self, obj):
+        return self.get_url_new_child(obj)
 
 class ContributionSerializer(serializers.ModelSerializer):
     """Serializes UserProfile model"""
-    project_name = serializers.SerializerMethodField()
-    author = serializers.SerializerMethodField()
-    creation_date = serializers.SerializerMethodField()
-    contributing = serializers.SerializerMethodField()
 
     def get_project_name_list():
         """returns a list of tuple with [(id,project name),..]"""
@@ -215,18 +212,13 @@ class ContributionSerializer(serializers.ModelSerializer):
 
     contribute_to = serializers.ChoiceField(choices=get_project_name_list(), required=False)
 
-
     class Meta:
         model = models.ContributorProjet
         if SERIALIZER_DEBUG:
             fields = '__all__'
         else:
-            fields = ['project', 'project_name', 'contribute_to', 'author', 'creation_date', 'contributing']
+            fields = ['contribute_to']
 
-        extra_kwargs = {
-            'project': {'read_only': True},
-            'project_name': {'read_only': True},
-        }
 
     def create(self, validated_data):
         """Create and return new user"""
@@ -239,19 +231,3 @@ class ContributionSerializer(serializers.ModelSerializer):
         except Exception as excep:
             error = {'message': ",".join(excep.args) if len(excep.args) > 0 else 'Unknown Error'}
             raise serializers.ValidationError(error)
-
-    def get_project_name(self, obj):
-        return obj.project.name
-
-    def get_author(self, obj):
-        return obj.project.author.user_profile.username
-
-    def get_creation_date(self, obj):
-        return obj.project.created_time
-
-    def get_contributing(self,obj):
-        for contributor in obj.project.contributors.all():
-            if self.context['request'].user.id == contributor.user_profile.id:
-                return True
-
-        return False
