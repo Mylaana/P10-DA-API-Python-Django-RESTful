@@ -37,6 +37,21 @@ class CommentManager(models.Manager):
 
         return comment
 
+class ContributionManager(models.Manager):
+    """Database Contribution-project manager model"""
+
+    def create_contribution(self, contributors, project):
+        """Handles Contribution creation"""
+
+        if not project:
+            raise ValueError("Please select a project")
+
+        if ContributorProjet.objects.filter(contributors=contributors, project=project).exists():
+            raise ValueError("You are already contributing to this project")
+
+        contribution = ContributorProjet.objects.create(contributors=contributors, project=project)
+
+        return contribution
 
 class Project(models.Model):
     """Database Project class model"""
@@ -110,6 +125,7 @@ class ContributorProjet(models.Model):
     contributors = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
+    objects = ContributionManager()
     class Meta:
         unique_together = ('contributors', 'project')
 

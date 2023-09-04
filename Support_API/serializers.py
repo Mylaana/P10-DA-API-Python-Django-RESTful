@@ -200,11 +200,20 @@ class ChoicesField(serializers.Field):
 
 class ContributionSerializer(serializers.ModelSerializer):
     """Serializes UserProfile model"""
-    # project_name = serializers.SerializerMethodField()
-    project_name = serializers.CharField(default='')
-    project_name_list =  serializers.SerializerMethodField()
-    selected_project = serializers.ChoiceField(choices=[("option1", "Option 1"), ("option2", "Option 2")], required=False)
-    # selected_project = ChoicesField(choices=["a","b"])
+    project_name = serializers.SerializerMethodField()
+    author = serializers.SerializerMethodField()
+    creation_date = serializers.SerializerMethodField()
+    contributing = serializers.SerializerMethodField()
+
+    def get_project_name_list():
+        """returns a list of tuple with [(id,project name),..]"""
+        project_list = []
+        for project in models.Project.objects.all():
+            project_list.append((project.id, f"projet {project.id} : {project.name}"))
+
+        return project_list
+
+    contribute_to = serializers.ChoiceField(choices=get_project_name_list(), required=False)
 
 
     class Meta:
@@ -212,25 +221,37 @@ class ContributionSerializer(serializers.ModelSerializer):
         if SERIALIZER_DEBUG:
             fields = '__all__'
         else:
-            fields = ['url', 'project', 'project_name', 'project_name_list', 'selected_project']
+            fields = ['project', 'project_name', 'contribute_to', 'author', 'creation_date', 'contributing']
 
         extra_kwargs = {
-            'project': {'read_only': False},
+            'project': {'read_only': True},
+            'project_name': {'read_only': True},
         }
 
     def create(self, validated_data):
         """Create and return new user"""
-        user = models.ContributorProjet.objects.create(
-            project=validated_data['project'],
-            contributors=get_contributor(self.context['request'].user),
-        )
+        try:
+            contribution = models.ContributorProjet.objects.create_contribution(
+                project=models.Project.objects.get(id=validated_data['contribute_to']),
+                contributors=get_contributor(self.context['request'].user))
+            return contribution
 
-        return user
-    """
-    def get_selected_project(self, obj):
-        # Si 'selected_project' n'est pas défini dans l'objet, renvoie une valeur par défaut
-        return getattr(obj, 'selected_project', "option1")
-    """
-    def get_project_name_list(self, obj):
-        return ["pouet","pouet pouet"]
-        return get_contributors_name_list(obj.contributors.all())
+        except Exception as excep:
+            error = {'message': ",".join(excep.args) if len(excep.args) > 0 else 'Unknown Error'}
+            raise serializers.ValidationError(error)
+
+    def get_project_name(self, obj):
+        return obj.project.name
+
+    def get_author(self, obj):
+        return obj.project.author.user_profile.username
+
+    def get_creation_date(self, obj):
+        return obj.project.created_time
+
+    def get_contributing(self,obj):
+        for contributor in obj.project.contributors.all():
+            if self.context['request'].user.id == contributor.user_profile.id:
+                return True
+
+        return False
