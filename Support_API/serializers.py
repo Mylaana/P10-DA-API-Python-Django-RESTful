@@ -110,6 +110,29 @@ class CommentSerializer(BaseSerializer):
 
 class IssueSerializer(BaseSerializer):
     """Serializes Issue model"""
+    def __init__(self, instance=None, data=empty, **kwargs):
+        super().__init__(instance, data, **kwargs)
+        project_id = 0
+        for key, value in self.context.items():
+            if key == 'project_id':
+                project_id = int(value)
+                break
+
+        choice_list = self.get_assign_to_list(project_id)
+        if not choice_list is None:
+            self.fields['assign_issue_to'].choices = choice_list
+
+    def get_assign_to_list(self, project_id):
+        """returns a list of contributor to assign issue to as a list of tuples"""
+        project = models.Project.objects.filter(id=project_id).first()
+        if project is None:
+            return None
+        choice_list = [(0, None)]
+        for contributor in project.contributors.all():
+            choice_list.append((contributor.user_profile.id, contributor.user_profile.username))
+
+        return choice_list
+
     class Meta:
         model = models.Issue
         if SERIALIZER_DEBUG:
@@ -117,14 +140,14 @@ class IssueSerializer(BaseSerializer):
         else:
             fields = ['url', 'add_new_comment', 'created_time', 'name', 'author_name','priority',
                       'priority_description', 'issue_type', 'issue_type_description', 'progression', 
-                      'progression_description', 'description', 'comments']
+                      'progression_description', 'assigned_to_name', 'assign_issue_to', 'description', 'comments']
 
         extra_kwargs = {
             'progression': {'write_only': True},
             'issue_type': {'write_only': True},
             'priority': {'write_only': True},
-        }
 
+        }
 
     comments = CommentSerializer(many=True, read_only=True)
     url = serializers.SerializerMethodField()
@@ -134,9 +157,19 @@ class IssueSerializer(BaseSerializer):
     priority_description = serializers.CharField(source='get_priority_display', read_only=True)
     issue_type_description = serializers.CharField(source='get_issue_type_display', read_only=True)
     progression_description = serializers.CharField(source='get_progression_display', read_only=True)
+    assigned_to_name = serializers.SerializerMethodField()
+
+    assign_issue_to = serializers.ChoiceField(choices=[], required=False)
+
 
     def create(self, validated_data):
         """Create and return new Issue"""
+
+        if models.Contributor.objects.filter(user_profile_id=validated_data['assign_issue_to']).exists():
+            Contributor = models.Contributor.objects.get(user_profile_id=validated_data['assign_issue_to'])
+        else:
+            Contributor = None
+        
         issue = models.Issue.objects.create_issue(
             name=validated_data['name'],
             author=get_contributor(self.context['request'].user),
@@ -144,7 +177,8 @@ class IssueSerializer(BaseSerializer):
             description=validated_data['description'],
             priority=validated_data['priority'],
             issue_type=validated_data['issue_type'],
-            progression=validated_data['progression']
+            progression=validated_data['progression'],
+            assigned_to=Contributor
         )
         return issue
 
@@ -157,6 +191,11 @@ class IssueSerializer(BaseSerializer):
     def get_parent_url(self, obj):
         project_url = str(self.url_name_project) + "/"  + str(obj.project.id) + "/"
         return str(project_url)
+
+    def get_assigned_to_name(self, obj):
+        if obj.assigned_to is None:
+            return ''
+        return obj.assigned_to.user_profile.username
 
 class ProjectSerializer(BaseSerializer):
     """Serializes Project model"""

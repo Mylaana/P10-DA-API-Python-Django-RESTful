@@ -14,10 +14,11 @@ def is_contributing(request, project):
     return False
 
 class ProjectViewSet(viewsets.ModelViewSet):
-    """Handle creating and updating profiles"""
+    """Handle creating and updating project"""
     serializer_class = serializers.ProjectSerializer
     permission_classes = [IsAuthenticated, permissions.UpdateRessource]
     queryset = models.Project.objects.all()
+
 
     def get_queryset(self):
         """customizing queryset according to user rights"""
@@ -33,7 +34,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
 class IssueViewSet(viewsets.ModelViewSet):
-    """Handle creating and updating profiles"""
+    """Handle creating and updating issues"""
     serializer_class = serializers.IssueSerializer
     queryset = models.Issue.objects.all()
     permission_classes = [IsAuthenticated, permissions.UpdateRessource]
@@ -42,9 +43,14 @@ class IssueViewSet(viewsets.ModelViewSet):
         project_id=self.kwargs['project_id']
         return self.queryset.filter(project_id=project_id)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        # adds project_id to the serializer's context
+        context.update({"project_id": self.kwargs.get('project_id')})
+        return context
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """Handle creating and updating profiles"""
+    """Handle creating and updating comments"""
     serializer_class = serializers.CommentSerializer
     queryset = models.Comment.objects.all()
     permission_classes = [IsAuthenticated, permissions.UpdateRessource]

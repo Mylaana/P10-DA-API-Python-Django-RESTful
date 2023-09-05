@@ -18,12 +18,12 @@ class ProjectManager(models.Manager):
 
 class IssueManager(models.Manager):
     """Database Issue manager model"""
-    def create_issue(self, name, author, project, description, priority, issue_type, progression):
+    def create_issue(self, name, author, project, description, priority, issue_type, progression, assigned_to):
         """Handles Issue creation"""
-
+        print(assigned_to)
         issue = Issue.objects.create(
             name=name, author=author, project=project, description=description,
-            priority=priority, issue_type=issue_type, progression=progression)
+            priority=priority, issue_type=issue_type, progression=progression, assigned_to=assigned_to)
 
         return issue
 
@@ -78,6 +78,7 @@ class Issue(models.Model):
     """Database Issue model"""
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='issues')
     author = models.ForeignKey(Contributor, on_delete=models.CASCADE)
+    assigned_to = models.ForeignKey(Contributor, on_delete=models.CASCADE, related_name='assigned_to', null=True)
     created_time = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(max_length=2048)
