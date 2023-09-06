@@ -45,11 +45,13 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt'
 ]
 
+# rest_framework.pagination.LimitOffsetPagination
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100,
+    'PAGE_SIZE': 1,
     'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',)
 }
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -139,3 +141,4 @@ AUTH_USER_MODEL = 'UserProfile_API.UserProfile'
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=600),
 }
+

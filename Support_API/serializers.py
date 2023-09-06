@@ -140,12 +140,13 @@ class IssueSerializer(BaseSerializer):
         else:
             fields = ['url', 'add_new_comment', 'created_time', 'name', 'author_name','priority',
                       'priority_description', 'issue_type', 'issue_type_description', 'progression', 
-                      'progression_description', 'assigned_to_name', 'assign_issue_to', 'description', 'comments']
+                      'progression_description', 'assigned_to', 'assigned_to_name', 'assign_issue_to', 'description', 'comments']
 
         extra_kwargs = {
             'progression': {'write_only': True},
             'issue_type': {'write_only': True},
             'priority': {'write_only': True},
+            'assigned_to': {'read_only': True},
 
         }
 
@@ -166,10 +167,10 @@ class IssueSerializer(BaseSerializer):
         """Create and return new Issue"""
 
         if models.Contributor.objects.filter(user_profile_id=validated_data['assign_issue_to']).exists():
-            Contributor = models.Contributor.objects.get(user_profile_id=validated_data['assign_issue_to'])
+            contributor = models.Contributor.objects.get(user_profile_id=validated_data['assign_issue_to'])
         else:
-            Contributor = None
-        
+            contributor = None
+        print(contributor)
         issue = models.Issue.objects.create_issue(
             name=validated_data['name'],
             author=get_contributor(self.context['request'].user),
@@ -178,9 +179,33 @@ class IssueSerializer(BaseSerializer):
             priority=validated_data['priority'],
             issue_type=validated_data['issue_type'],
             progression=validated_data['progression'],
-            assigned_to=Contributor
+            assigned_to=contributor
         )
         return issue
+
+    def update(self, instance, validated_data):
+        if 'assign_issue_to' in validated_data:
+            assign_issue_to = validated_data.pop('assign_issue_to')
+            if assign_issue_to:
+                # Vérifiez si l'assigné existe en tant que Contributor
+                if models.Contributor.objects.filter(user_profile_id=assign_issue_to).exists():
+                    contributor = models.Contributor.objects.get(user_profile_id=assign_issue_to)
+                else:
+                    contributor = None
+            else:
+                contributor = None
+            instance.assigned_to = contributor
+
+        # Mettez à jour les autres champs de l'instance en fonction des données validées
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.priority = validated_data.get('priority', instance.priority)
+        instance.issue_type = validated_data.get('issue_type', instance.issue_type)
+        instance.progression = validated_data.get('progression', instance.progression)
+
+        # Enregistrez les modifications de l'instance Issue
+        instance.save()
+        return instance
 
     def get_add_new_comment(self, obj):
         return self.get_url_new_child(obj)

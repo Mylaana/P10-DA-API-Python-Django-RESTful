@@ -1,6 +1,5 @@
-from rest_framework import viewsets, status
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, pagination 
 
 from Support_API import models
 from . import serializers
@@ -19,7 +18,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, permissions.UpdateRessource]
     queryset = models.Project.objects.all()
 
-
     def get_queryset(self):
         """customizing queryset according to user rights"""
         if self.request.user.is_admin or self.request.user.is_superuser:
@@ -31,7 +29,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 contributing_project_list.append(project.id)
 
         return models.Project.objects.filter(id__in=contributing_project_list)
-
 
 class IssueViewSet(viewsets.ModelViewSet):
     """Handle creating and updating issues"""
@@ -57,7 +54,18 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         issue_id=self.kwargs['issue_id']
+
+        page_size = self.request.query_params.get('page_size')
+        if page_size:
+            try:
+                page_size = int(page_size)
+                if page_size > 0:
+                    self.pagination_class.default_limit = page_size
+            except ValueError:
+                pass  # Ignore si la valeur n'est pas un entier valide
+
         return self.queryset.filter(issue_id=issue_id)
+
 
 class ContributionViewSet(viewsets.ModelViewSet):
     """Handles user contribution to projects"""
