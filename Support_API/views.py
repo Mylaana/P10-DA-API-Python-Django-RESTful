@@ -46,11 +46,15 @@ class IssueViewSet(viewsets.ModelViewSet):
         context.update({"project_id": self.kwargs.get('project_id')})
         return context
 
+class CommentPagination(pagination.PageNumberPagination):       
+       page_size = 50
+
 class CommentViewSet(viewsets.ModelViewSet):
     """Handle creating and updating comments"""
     serializer_class = serializers.CommentSerializer
     queryset = models.Comment.objects.all()
     permission_classes = [IsAuthenticated, permissions.UpdateRessource]
+    pagination_class=CommentPagination
 
     def get_queryset(self):
         issue_id=self.kwargs['issue_id']
