@@ -96,9 +96,9 @@ Vous pouvez également vous connecter à l'interface d'administration http://loc
   methode PATCH : permet de mettre à jour certaines informations de l'instance projet [projetID] (owner/admin seulement)  
   methode DELETE : permet de supprimer l'instance projet [projetID] (owner/admin seulement)  
 
-- Projet/[projetID]/issue : http://127.0.0.1:8000/project/[projetID]/issue
-  methode GET : permet de lister les issues attachées à l'instance du projet [projetID] (contributor/admin seulement)
-  methode POST : permet de créer une nouvelle issue attachée à l'instance du projet [projetID] (contributor/admin seulement)
+- Projet/[projetID]/issue : http://127.0.0.1:8000/project/[projetID]/issue  
+  methode GET : permet de lister les issues attachées à l'instance du projet [projetID] (contributor/admin seulement)  
+  methode POST : permet de créer une nouvelle issue attachée à l'instance du projet [projetID] (contributor/admin seulement)  
 
 - Projet/[projetID]/issue/[issueID] : http://127.0.0.1:8000/project/[projetID]/issue/issue[ID]  
   methode PUT : permet de mettre à jour toutes les informations de l'instance issue [issueID] (owner/admin seulement)  
