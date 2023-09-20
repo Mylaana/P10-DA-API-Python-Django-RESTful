@@ -78,12 +78,45 @@ Vous pouvez également vous connecter à l'interface d'administration http://loc
   methode POST : permet de créer un utilisateur
     (pour limiter la création de compte, seul un admin ou un utilisateur authentifié peuvent créer de nouveaux profils)
 
--Profile + profileID : http://127.0.0.1:8000/profile/[profileID]
-  **acces au endpoint restraint soit à l'utilisateur du profil soit à un admin**
-  methode GET : permet de lister les informations de l'utilisateur
-  methode PUT : permet de mettre à jour toutes les informations de l'utilisateur (owner/admin seulement)
-  methode PATCH : permet de mettre à jour certaines informations de l'utilisateur (owner/admin seulement)
-  methode DELETE : permet de supprimer l'utilisateur (owner/admin seulement)
+- Profile/[profileID] : http://127.0.0.1:8000/profile/[profileID]  
+  **acces au endpoint restraint soit à l'utilisateur du profil soit à un admin**  
+  methode GET : permet de lister les informations de l'utilisateur  
+  methode PUT : permet de mettre à jour toutes les informations de l'utilisateur (owner/admin seulement)  
+  methode PATCH : permet de mettre à jour certaines informations de l'utilisateur (owner/admin seulement)  
+  methode DELETE : permet de supprimer l'utilisateur (owner/admin seulement)  
 
-- Project (method GET): http://127.0.0.1:8000/project/
-- project-contribution (method GET): http://127.0.0.1:8000/project-contribution/
+- Project : http://127.0.0.1:8000/project/  
+  methode GET : permet d'accéder à la liste des projets (admin/contributor seulement) de voir des informations sur le projet
+    ainsi que les issues rattachées et leurs commentaires.
+  methode POST : permet de créer un projet et d'en devenir contributeur.
+
+- Projet/[projetID] : http://127.0.0.1:8000/project/[projetID]
+  methode GET : permet de voir les informations de l'instance [projetID] ainsi que les informations y étant attachées (admin/contributor seulement)  
+  methode PUT : permet de mettre à jour toutes les informations de l'instance projet [projetID] (owner/admin seulement)  
+  methode PATCH : permet de mettre à jour certaines informations de l'instance projet [projetID] (owner/admin seulement)  
+  methode DELETE : permet de supprimer l'instance projet [projetID] (owner/admin seulement)  
+
+- Projet/[projetID]/issue : http://127.0.0.1:8000/project/[projetID]/issue
+  methode GET : permet de lister les issues attachées à l'instance du projet [projetID] (contributor/admin seulement)
+  methode POST : permet de créer une nouvelle issue attachée à l'instance du projet [projetID] (contributor/admin seulement)
+
+- Projet/[projetID]/issue/[issueID] : http://127.0.0.1:8000/project/[projetID]/issue/issue[ID]  
+  methode PUT : permet de mettre à jour toutes les informations de l'instance issue [issueID] (owner/admin seulement)  
+  methode PATCH : permet de mettre à jour certaines informations de l'instance issue [issueID] (owner/admin seulement)  
+  methode DELETE : permet de supprimer l'instance de l'issue [issueID] (owner/admin seulement)  
+
+- Projet/[projetID]/issue/[issueID]/comment : http://127.0.0.1:8000/project/[projetID]/issue/[issueID]/comment  
+  methode GET : permet de lister les comments attachées à l'instance de l'issue [issueID] (contributor/admin seulement)  
+  methode POST : permet de créer une nouvelle issue attachée à l'instance du projet [projetID] (contributor/admin seulement)  
+
+- Projet/[projetID]/Issue/[issueID]/comment/[commentUUID] : http://127.0.0.1:8000/project/[projetID]/Issue/issue[ID]/comment/[commentUUID]  
+  methode PUT : permet de mettre à jour toutes les informations de l'instance comment [commentUUID] (owner/admin seulement)  
+  methode PATCH : permet de mettre à jour certaines informations de l'instance comment [commentUUID] (owner/admin seulement)  
+  methode DELETE : permet de supprimer l'instance de l'issue [commentUUID] (owner/admin seulement)  
+  
+- project-contribution: http://127.0.0.1:8000/project-contribution/  
+  methode GET : permet d'accéder à la liste des projets et de voir si on y contribue déja ou non.  
+  methode POST : permet de contribuer à un projet.
+
+- project-contribution/[contributionID] http://127.0.0.1:8000/project-contribution/[contributionID]  
+  methode DELETE : permet de supprimer sa contribution au projet.
