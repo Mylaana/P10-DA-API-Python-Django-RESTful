@@ -79,18 +79,16 @@ Vous pouvez également vous connecter à l'interface d'administration http://loc
     (pour limiter la création de compte, seul un admin ou un utilisateur authentifié peuvent créer de nouveaux profils)
 
 - Profile/[profileID] : http://127.0.0.1:8000/profile/[profileID]  
-  **acces au endpoint restraint soit à l'utilisateur du profil soit à un admin**  
   methode GET : permet de lister les informations de l'utilisateur  
   methode PUT : permet de mettre à jour toutes les informations de l'utilisateur (owner/admin seulement)  
   methode PATCH : permet de mettre à jour certaines informations de l'utilisateur (owner/admin seulement)  
   methode DELETE : permet de supprimer l'utilisateur (owner/admin seulement)  
 
 - Project : http://127.0.0.1:8000/project/  
-  methode GET : permet d'accéder à la liste des projets (admin/contributor seulement) de voir des informations sur le projet
-    ainsi que les issues rattachées et leurs commentaires.  
+  methode GET : permet d'accéder à la liste des projets (admin/contributor seulement)  
   methode POST : permet de créer un projet et d'en devenir contributeur.  
 
-- Projet/[projetID] : http://127.0.0.1:8000/project/[projetID]
+- Projet/[projetID] : http://127.0.0.1:8000/project/[projetID]  
   methode GET : permet de voir les informations de l'instance [projetID] ainsi que les informations y étant attachées (admin/contributor seulement)  
   methode PUT : permet de mettre à jour toutes les informations de l'instance projet [projetID] (owner/admin seulement)  
   methode PATCH : permet de mettre à jour certaines informations de l'instance projet [projetID] (owner/admin seulement)  
