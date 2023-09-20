@@ -7,7 +7,6 @@ Ce README explique comment installer et configurer l'API Django REST.
 **Installation**  
 **Exécution**  
 **Utilisation**  
-**Tests**  
 
 ## Prérequis
 Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur votre système :
