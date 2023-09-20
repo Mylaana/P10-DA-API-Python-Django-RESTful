@@ -87,8 +87,8 @@ Vous pouvez également vous connecter à l'interface d'administration http://loc
 
 - Project : http://127.0.0.1:8000/project/  
   methode GET : permet d'accéder à la liste des projets (admin/contributor seulement) de voir des informations sur le projet
-    ainsi que les issues rattachées et leurs commentaires.
-  methode POST : permet de créer un projet et d'en devenir contributeur.
+    ainsi que les issues rattachées et leurs commentaires.  
+  methode POST : permet de créer un projet et d'en devenir contributeur.  
 
 - Projet/[projetID] : http://127.0.0.1:8000/project/[projetID]
   methode GET : permet de voir les informations de l'instance [projetID] ainsi que les informations y étant attachées (admin/contributor seulement)  
